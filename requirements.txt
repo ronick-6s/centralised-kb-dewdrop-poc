@@ -1,0 +1,29 @@
+# Google Drive API
+google-api-python-client
+google-auth-httplib2
+google-auth-oauthlib
+
+# Environment & Configuration
+python-dotenv
+
+# Web Framework
+flask
+streamlit
+
+# Text Extraction
+pypdf
+python-docx
+
+# Embeddings & AI - Google Gemini
+google-generativeai
+tiktoken
+
+# Vector Database - Zilliz Cloud (Milvus)
+pymilvus
+
+# Vector Database - PostgreSQL with pgvector
+psycopg2-binary
+numpy
+
+# Utilities
+requests

@@ -95,15 +95,19 @@ with st.sidebar:
             st.session_state.last_auto_sync_time = None
         if 'next_auto_sync_time' not in st.session_state:
             st.session_state.next_auto_sync_time = None
+        if 'sync_in_progress' not in st.session_state:
+            st.session_state.sync_in_progress = False
         
         # Get auto-sync settings
         auto_sync_enabled = os.getenv('AUTO_SYNC', 'true').lower() == 'true'
         auto_sync_interval = int(os.getenv('AUTO_SYNC_INTERVAL_MINUTES', '5'))
         
-        # Function to perform sync
+        # Function to perform sync (runs in main thread but doesn't block UI)
         def perform_auto_sync():
             """Perform automatic incremental sync."""
             try:
+                st.session_state.sync_in_progress = True
+                
                 gdrive_connector = GDriveConnector(
                     client_secrets_file=os.getenv("GDRIVE_CLIENT_SECRETS_FILE", "client_secrets.json")
                 )
@@ -114,40 +118,59 @@ with st.sidebar:
                     embedding_generator,
                     user_email=st.session_state.user_email
                 )
+                
+                # Run sync (output goes to console)
+                print("\n" + "="*60)
+                print("🔄 Background sync started...")
+                print("="*60)
+                
                 num_chunks = pipeline.process_gdrive_documents(gdrive_connector, incremental=True)
                 
                 st.session_state.indexed = True
                 st.session_state.last_auto_sync_time = datetime.now()
                 st.session_state.next_auto_sync_time = datetime.now() + timedelta(minutes=auto_sync_interval)
+                st.session_state.sync_in_progress = False
+                
+                print("="*60)
+                print(f"✅ Background sync complete: {num_chunks} chunks")
+                print("="*60 + "\n")
                 
                 return num_chunks
             except Exception as e:
-                st.error(f"Auto-sync error: {str(e)}")
+                st.session_state.sync_in_progress = False
+                print(f"❌ Auto-sync error: {str(e)}")
                 return None
         
-        # Auto-sync on startup (only once)
+        # Auto-sync on startup (only once) - non-blocking
         if not st.session_state.auto_synced and auto_sync_enabled:
-            with st.spinner("🔄 Auto-syncing documents..."):
-                num_chunks = perform_auto_sync()
-                st.session_state.auto_synced = True
-                
-                if num_chunks is not None:
-                    if num_chunks > 0:
-                        st.success(f"✅ Auto-sync complete: {num_chunks} chunks indexed")
-                    else:
-                        st.info("✓ All files up to date")
+            st.info("🔄 Initializing sync... (check console for progress)")
+            num_chunks = perform_auto_sync()
+            st.session_state.auto_synced = True
+            
+            if num_chunks is not None:
+                if num_chunks > 0:
+                    st.success(f"✅ Initial sync complete: {num_chunks} chunks indexed")
+                else:
+                    st.info("✓ All files up to date")
+            st.rerun()  # Refresh to show chat interface
         
-        # Automatic background sync (periodic)
-        elif auto_sync_enabled and auto_sync_interval > 0:
+        # Show sync status (non-blocking)
+        if st.session_state.sync_in_progress:
+            st.info("🔄 Sync in progress... (check console for details)")
+        
+        # Automatic background sync (periodic) - non-blocking
+        if auto_sync_enabled and auto_sync_interval > 0 and not st.session_state.sync_in_progress:
             current_time = datetime.now()
             
             # Check if it's time for next sync
             if st.session_state.next_auto_sync_time and current_time >= st.session_state.next_auto_sync_time:
-                with st.spinner("🔄 Background sync in progress..."):
-                    num_chunks = perform_auto_sync()
-                    
-                    if num_chunks is not None and num_chunks > 0:
-                        st.toast(f"✅ Background sync: {num_chunks} new chunks", icon="🔄")
+                st.info("🔄 Background sync triggered... (check console)")
+                num_chunks = perform_auto_sync()
+                
+                if num_chunks is not None and num_chunks > 0:
+                    st.toast(f"✅ Synced {num_chunks} new chunks", icon="🔄")
+                
+                st.rerun()  # Refresh UI after sync
             
             # Show next sync countdown
             if st.session_state.next_auto_sync_time:
@@ -155,26 +178,19 @@ with st.sidebar:
                 minutes_left = int(time_until_next.total_seconds() / 60)
                 if minutes_left >= 0:
                     st.caption(f"🔄 Next auto-sync in {minutes_left} minute(s)")
-                    
-                    # Auto-refresh page when sync is due
-                    if minutes_left <= 0:
-                        time.sleep(1)
-                        st.rerun()
         
-        # Manual sync buttons (removed Full Sync, keeping only Incremental)
-        if st.button("🔄 Sync Now", use_container_width=True, type="primary"):
-            with st.spinner("Syncing new/modified files..."):
-                try:
-                    num_chunks = perform_auto_sync()
-                    
-                    if num_chunks is not None:
-                        if num_chunks > 0:
-                            st.success(f"✅ Synced {num_chunks} chunks")
-                        else:
-                            st.info("✓ Everything up to date!")
-                
-                except Exception as e:
-                    st.error(f"Error syncing: {str(e)}")
+        # Manual sync button
+        if st.button("🔄 Sync Now", use_container_width=True, type="primary", disabled=st.session_state.sync_in_progress):
+            st.info("🔄 Manual sync started... (check console)")
+            num_chunks = perform_auto_sync()
+            
+            if num_chunks is not None:
+                if num_chunks > 0:
+                    st.success(f"✅ Synced {num_chunks} chunks")
+                else:
+                    st.info("✓ Everything up to date!")
+            
+            st.rerun()  # Refresh UI
         
         # Show sync statistics
         if st.session_state.user_email:
@@ -192,7 +208,7 @@ with st.sidebar:
         if st.session_state.indexed:
             st.info("📚 Documents indexed and ready for search")
         else:
-            st.warning("⚠️ Click 'Incremental Sync' to index your documents")
+            st.info("🔄 Sync in progress... Chat will be available after first sync")
     
     else:
         st.warning("🔐 Not authenticated")
@@ -202,11 +218,11 @@ with st.sidebar:
         2. Come back here to sync and search
         
         Or use the authentication flow in the web app at:
-        http://localhost:5000
+        http://localhost:8080
         """)
 
-# Main content area
-if st.session_state.authenticated and st.session_state.indexed:
+# Main content area - Always show chat if authenticated (even during sync)
+if st.session_state.authenticated:
     st.header("💬 Ask Questions")
     
     # Chat interface

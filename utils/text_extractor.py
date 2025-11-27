@@ -22,19 +22,32 @@ class TextExtractor:
             mime_type: MIME type of the file
             
         Returns:
-            Extracted text content
+            Extracted text content (NUL characters removed)
         """
         try:
+            text = ""
+            
             if mime_type == 'application/pdf':
-                return TextExtractor._extract_pdf(file_bytes)
+                text = TextExtractor._extract_pdf(file_bytes)
             elif mime_type in ['application/vnd.openxmlformats-officedocument.wordprocessingml.document', 
                               'application/msword']:
-                return TextExtractor._extract_docx(file_bytes)
+                text = TextExtractor._extract_docx(file_bytes)
+            elif mime_type in ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                              'application/vnd.ms-excel',
+                              'text/csv']:
+                # For Excel/CSV files, decode as text (may have NUL bytes)
+                text = file_bytes.decode('utf-8', errors='ignore')
             elif mime_type.startswith('text/'):
-                return file_bytes.decode('utf-8', errors='ignore')
+                text = file_bytes.decode('utf-8', errors='ignore')
             else:
                 # For unsupported types, try to decode as text
-                return file_bytes.decode('utf-8', errors='ignore')
+                text = file_bytes.decode('utf-8', errors='ignore')
+            
+            # Remove NUL characters (0x00) that cause PostgreSQL errors
+            text = text.replace('\x00', '')
+            
+            return text
+            
         except Exception as e:
             print(f"Error extracting text from {mime_type}: {e}")
             return ""

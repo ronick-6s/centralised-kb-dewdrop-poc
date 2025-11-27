@@ -196,6 +196,9 @@ class GDriveConnector(BaseConnector):
                     while not done:
                         status, done = downloader.next_chunk()
                     file_bytes = fh.getvalue()
+                    while not done:
+                        status, done = downloader.next_chunk()
+                    file_bytes = fh.getvalue()
                 
                 else:
                     # Skip unsupported file types

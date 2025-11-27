@@ -1,4 +1,4 @@
-# 🔍 Enterprise Search Agent
+# Enterprise Search Agent
 
 **Fully Automatic Multi-User RAG System for Google Drive**
 
@@ -6,7 +6,7 @@ Search and chat with your Google Drive documents using AI. Supports multi-user i
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
 ### 1. Install Dependencies
 
@@ -81,39 +81,39 @@ python3 export_credentials.py
 streamlit run streamlit_app.py
 ```
 
-### 5. That's It! 🎉
+### 5. That's It!
 
 The app will:
-- ✅ Auto-sync on startup
-- ✅ Sync every 15 minutes automatically
-- ✅ Only sync new/modified files
-- ✅ Support multiple users with data isolation
+- Auto-sync on startup
+- Sync every 15 minutes automatically
+- Only sync new/modified files
+- Support multiple users with data isolation
 
 ---
 
-## 🎯 Key Features
+## Key Features
 
-### ✨ Fully Automatic Sync
+### Fully Automatic Sync
 - Auto-sync on startup
 - Periodic background sync (every 15 minutes)
 - Incremental updates (only new/modified files)
 - Smart change detection (Google Drive modifiedTime)
 - Deleted file handling
 
-### 👥 Multi-User Support
+### Multi-User Support
 - Complete data isolation per user
 - User-specific database tables
 - Independent sync state per user
 - Concurrent multi-user usage
 - No cross-user data access
 
-### 🔍 Smart Search
+### Smart Search
 - Permission-aware search
 - Context-aware semantic search
 - Natural language Q&A
 - Source citations
 
-### 📁 File Support
+### File Support
 - PDF, DOCX, XLSX
 - Google Docs, Sheets, Slides
 - TXT, CSV, JSON
@@ -121,7 +121,7 @@ The app will:
 
 ---
 
-## 🔄 How Automatic Sync Works
+## How Automatic Sync Works
 
 ### On Startup
 
@@ -129,25 +129,25 @@ The app will:
 1. User opens app
 2. Authenticates with Google
 3. Auto-sync starts:
-   📊 Incremental Sync Analysis:
-      ✨ New files: 2
-      🔄 Modified files: 1
-      ✓  Unchanged files: 177 (skipped)
-   ✅ Auto-sync complete: 35 chunks
+   Incremental Sync Analysis:
+      New files: 2
+      Modified files: 1
+      Unchanged files: 177 (skipped)
+   Auto-sync complete: 35 chunks
 ```
 
 ### During Usage (Every 15 Minutes)
 
 ```
-🔄 Next auto-sync in 3 minute(s)
+Next auto-sync in 3 minute(s)
 ...
-🔄 Background sync in progress...
-✅ Background sync: 0 chunks (all up to date)
+Background sync in progress...
+Background sync: 0 chunks (all up to date)
 ```
 
 ---
 
-## 👥 Multi-User Implementation
+## Multi-User Implementation
 
 Each user gets:
 - Own database table: `documents_{email}`
@@ -170,7 +170,7 @@ COMPLETELY SEPARATE!
 
 ---
 
-## 📊 Performance
+## Performance
 
 ### First Sync
 - Files: 180
@@ -184,7 +184,7 @@ COMPLETELY SEPARATE!
 
 ---
 
-## 🔧 Configuration
+## Configuration
 
 ### Sync Intervals (.env)
 
@@ -204,7 +204,7 @@ AUTO_SYNC_INTERVAL_MINUTES=0
 
 ---
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 ### Auto-sync not working
 
@@ -233,7 +233,7 @@ AUTO_SYNC_INTERVAL_MINUTES=30
 
 ---
 
-## 📚 Tech Stack
+## Tech Stack
 
 - **Python 3.9+** - Backend
 - **Streamlit** - UI
@@ -246,23 +246,23 @@ AUTO_SYNC_INTERVAL_MINUTES=30
 
 ---
 
-## 🔒 Security
+## Security
 
 ### What's Secure
-✅ OAuth 2.0 authentication  
-✅ User data isolation  
-✅ Permission filtering  
-✅ Local text processing  
-✅ No password storage  
+OAuth 2.0 authentication  
+User data isolation  
+Permission filtering  
+Local text processing  
+No password storage  
 
 ### What to Protect
-⚠️ API keys in `.env`  
-⚠️ `client_secrets.json`  
-⚠️ Database credentials  
+API keys in `.env`  
+`client_secrets.json`  
+Database credentials  
 
 ---
 
-## 📝 File Structure
+## File Structure
 
 ```
 enterprise-search-agent/
@@ -282,24 +282,24 @@ enterprise-search-agent/
 
 ---
 
-## 🎉 You're All Set!
+## You're All Set!
 
 ```bash
 streamlit run streamlit_app.py
 ```
 
 The system will:
-1. ✅ Auto-sync on startup
-2. ✅ Sync every 15 minutes
-3. ✅ Only sync changes
-4. ✅ Support multiple users
-5. ✅ Work automatically
+1. Auto-sync on startup
+2. Sync every 15 minutes
+3. Only sync changes
+4. Support multiple users
+5. Work automatically
 
-**No manual intervention needed!** 🚀
+**No manual intervention needed!**
 
 ---
 
-## 📚 Additional Documentation
+## Additional Documentation
 
 For detailed information, see:
 - `AUTOMATIC_SYNC_AND_MULTI_USER.md` - Complete sync & multi-user guide
@@ -308,6 +308,6 @@ For detailed information, see:
 
 ---
 
-## 📄 License
+## License
 
 MIT License - Free to use and modify
